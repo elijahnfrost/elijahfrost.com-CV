@@ -10,8 +10,23 @@ export function ContactForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
-    await new Promise((r) => setTimeout(r, 800));
-    setStatus("sent");
+    const data = new FormData(e.currentTarget);
+    const payload = {
+      name: data.get("name") as string,
+      email: data.get("email") as string,
+      message: data.get("message") as string,
+    };
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
   }
 
   if (status === "sent") {
@@ -84,13 +99,20 @@ export function ContactForm() {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={status === "sending"}
-        className="self-start rounded-full bg-stone-900 px-8 py-3 text-xs font-medium tracking-widest text-white uppercase transition-colors hover:bg-stone-700 disabled:opacity-50"
-      >
-        {status === "sending" ? "Sending…" : "Send Message"}
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          className="self-start rounded-full bg-stone-900 px-8 py-3 text-xs font-medium tracking-widest text-white uppercase transition-colors hover:bg-stone-700 disabled:opacity-50"
+        >
+          {status === "sending" ? "Sending…" : "Send Message"}
+        </button>
+        {status === "error" && (
+          <p className="text-xs text-red-500">
+            Something went wrong — please try again.
+          </p>
+        )}
+      </div>
     </form>
   );
 }

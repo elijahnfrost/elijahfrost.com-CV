@@ -207,7 +207,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
 function AboutSection({ entries, contactEntries }: { entries: CVEntry[]; contactEntries: CVEntry[] }) {
   const objective = entries.find((e) => !e.parentEntryId);
   const statsEntries = entries.filter(
-    (e) => e.parentEntryId && !e.children.length
+    (e) => !e.parentEntryId && !e.children.length
   );
   const academicStats = statsEntries.filter((e) =>
     /gpa|sat|rank|score|grade/i.test(e.name)
@@ -579,8 +579,8 @@ function SkillsSection({ entries }: { entries: CVEntry[] }) {
             ) : null}
           </div>
         ))}
-        {/* Flat entries (no parent) that aren't categories themselves */}
-        {entries.filter((e) => !e.parentEntryId && !e.children.length && !categories.find((c) => c.id === e.id)).length > 0 && (
+        {/* Flat skill entries with no parent and no children */}
+        {entries.filter((e) => !e.parentEntryId && !e.children.length).length > 0 && (
           <div className="flex flex-wrap gap-2">
             {entries
               .filter((e) => !e.parentEntryId && !e.children.length)
