@@ -1,8 +1,5 @@
 import { Client } from "@notionhq/client";
-import type {
-  PageObjectResponse,
-  QueryDatabaseResponse,
-} from "@notionhq/client/build/src/api-endpoints";
+import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export type CVSection =
   | "About"
@@ -28,7 +25,7 @@ export interface CVEntry {
   link: string | null;
   parentEntryId: string | null;
   sectionDescription: string | null;
-  resumeProfiles: string[];
+  resume: boolean;
   resumeDescription: string | null;
   resumeBullets: string | null;
   children: CVEntry[];
@@ -94,10 +91,10 @@ function getUrl(props: Props, key: string): string | null {
   return prop.url ?? null;
 }
 
-function getMultiSelect(props: Props, key: string): string[] {
+function getCheckbox(props: Props, key: string): boolean {
   const prop = props[key];
-  if (!prop || prop.type !== "multi_select") return [];
-  return prop.multi_select.map((o) => o.name);
+  if (!prop || prop.type !== "checkbox") return false;
+  return prop.checkbox ?? false;
 }
 
 function getRelationId(props: Props, key: string): string | null {
@@ -127,7 +124,7 @@ function mapPage(page: PageObjectResponse): CVEntry {
     link: getUrl(props, "Link"),
     parentEntryId: getRelationId(props, "Parent Entry"),
     sectionDescription: getText(props, "Section Description"),
-    resumeProfiles: getMultiSelect(props, "Resume Profiles"),
+    resume: getCheckbox(props, "Resume"),
     resumeDescription: getText(props, "Resume Description"),
     resumeBullets: getText(props, "Resume Bullets"),
     children: [],
@@ -167,23 +164,19 @@ function groupBySection(entries: CVEntry[]): CVData {
 }
 
 // ---------------------------------------------------------------------------
-// Database query helper
+// Database query helpers
 // ---------------------------------------------------------------------------
 
-async function queryAllVisiblePages(): Promise<PageObjectResponse[]> {
+async function paginateQuery(
+  args: Parameters<Client["databases"]["query"]>[0]
+): Promise<PageObjectResponse[]> {
   const notion = getNotionClient();
-  const databaseId = getDatabaseId();
   const pages: PageObjectResponse[] = [];
   let cursor: string | undefined;
 
   do {
-    const response: QueryDatabaseResponse = await notion.databases.query({
-      database_id: databaseId,
-      filter: {
-        property: "Visible",
-        checkbox: { equals: true },
-      },
-      sorts: [{ property: "Order", direction: "ascending" }],
+    const response = await notion.databases.query({
+      ...args,
       start_cursor: cursor,
     });
 
@@ -204,17 +197,33 @@ async function queryAllVisiblePages(): Promise<PageObjectResponse[]> {
 // ---------------------------------------------------------------------------
 
 export async function getCVData(): Promise<CVData> {
-  const pages = await queryAllVisiblePages();
+  const pages = await paginateQuery({
+    database_id: getDatabaseId(),
+    filter: {
+      property: "Visible",
+      checkbox: { equals: true },
+    },
+    sorts: [{ property: "Order", direction: "ascending" }],
+  });
+
   const entries = pages.map(mapPage);
   const nested = nestEntries(entries);
   return groupBySection(nested);
 }
 
-export async function getResumeData(profile: string): Promise<CVData> {
-  const pages = await queryAllVisiblePages();
-  const entries = pages
-    .map(mapPage)
-    .filter((e) => e.resumeProfiles.includes(profile));
+export async function getResumeData(): Promise<CVData> {
+  const pages = await paginateQuery({
+    database_id: getDatabaseId(),
+    filter: {
+      and: [
+        { property: "Visible", checkbox: { equals: true } },
+        { property: "Resume", checkbox: { equals: true } },
+      ],
+    },
+    sorts: [{ property: "Order", direction: "ascending" }],
+  });
+
+  const entries = pages.map(mapPage);
   const nested = nestEntries(entries);
   return groupBySection(nested);
 }

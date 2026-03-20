@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
-
-const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
-});
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -17,6 +11,9 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Elijah Frost",
   description: "Student Researcher & Developer",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -27,9 +24,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${playfair.variable} h-full scroll-smooth`}
+      className={`${playfair.variable} h-full scroll-smooth`}
     >
-      <body className="min-h-full bg-white text-stone-900 antialiased">
+      <body className="min-h-full bg-[#ffffff] text-[#1a1a1a] antialiased">
         {children}
       </body>
     </html>

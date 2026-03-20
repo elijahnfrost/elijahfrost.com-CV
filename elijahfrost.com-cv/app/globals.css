@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist);
+  --font-sans: var(--font-playfair);
   --font-serif: var(--font-playfair);
 }
 
@@ -11,6 +11,47 @@ html {
 
 body {
   background: #ffffff;
-  color: #1c1917;
-  font-family: var(--font-geist), system-ui, sans-serif;
+  color: #1a1a1a;
+  font-family: var(--font-playfair), "Times New Roman", serif;
+}
+
+section[id] {
+  scroll-margin-top: 84px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeUp 0.7s ease-out both;
+}
+
+.fade-in-up.delay-1 {
+  animation-delay: 80ms;
+}
+
+.fade-in-up.delay-2 {
+  animation-delay: 160ms;
+}
+
+.fade-in-up.delay-3 {
+  animation-delay: 240ms;
+}
+
+.fade-in-up.delay-4 {
+  animation-delay: 320ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
