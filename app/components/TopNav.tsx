@@ -99,7 +99,7 @@ export function TopNav({
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6 sm:px-10 lg:px-16">
           <a
             href="#home"
-            className="text-xl font-semibold tracking-wide text-[#1a1a1a]"
+            className="text-xl font-semibold tracking-wide text-[#1a1a1a] hover:opacity-70"
           >
             Elijah Frost
           </a>
