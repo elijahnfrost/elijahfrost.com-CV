@@ -569,6 +569,7 @@ function renderUniversalEntry(
 
 function renderUniversalSection(
   styles: MitStyles,
+  sectionKey: string,
   sectionTitle: string,
   entries: CVEntry[],
   mode: RenderMode,
@@ -576,7 +577,7 @@ function renderUniversalSection(
 ) {
   if (!entries.length) return null;
   return (
-    <View style={styles.section}>
+    <View key={sectionKey} style={styles.section}>
       {sectionHeader(sectionTitle, styles)}
       <View style={styles.sectionBody}>
         {entries.map((entry) =>
@@ -639,6 +640,7 @@ export function ResumeDocument({ sections }: ResumeDocumentProps) {
           return renderUniversalSection(
             resumeStyles,
             section.title,
+            section.title,
             section.entries,
             "resume",
             renderConfig
@@ -672,7 +674,14 @@ export function CVDocument({ sections }: CVDocumentProps) {
         {renderHeader(cvStyles, sectionMap)}
         {bodySections.map((section) => {
           if (!section.entries.length) return null;
-          return renderUniversalSection(cvStyles, section.title, section.entries, "cv", renderConfig);
+          return renderUniversalSection(
+            cvStyles,
+            section.title,
+            section.title,
+            section.entries,
+            "cv",
+            renderConfig
+          );
         })}
       </Page>
     </Document>

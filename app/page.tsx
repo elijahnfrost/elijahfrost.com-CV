@@ -81,8 +81,9 @@ function EntryTitle({
 
 function BulletList({ raw }: { raw: string }) {
   const items = raw
-    .split("\n")
+    .split(/\n|<br\s*\/?>/gi)
     .map((s) => s.trim())
+    .map((s) => s.replace(/^[-*•\s]+/, "").trim())
     .filter(Boolean);
 
   return (
@@ -180,7 +181,13 @@ function EducationSection({
               .map((child) => child.name.trim())
               .filter(Boolean)
               .join(", ");
+            const notionBullets = (entry.bullets ?? "")
+              .split(/\n|<br\s*\/?>/gi)
+              .map((line) => line.trim())
+              .map((line) => line.replace(/^[-*•\s]+/, "").trim())
+              .filter(Boolean);
             const bulletLines = [
+              ...notionBullets,
               ...(index === 0 && statsLine ? [statsLine] : []),
               ...(coursework ? [`Relevant Coursework: ${coursework}`] : []),
             ];
