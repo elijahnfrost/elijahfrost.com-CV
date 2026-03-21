@@ -72,38 +72,40 @@ export function DownloadButton({ href, label, className }: DownloadButtonProps) 
         className={className}
         aria-busy={isLoading}
       >
-        <span className="relative inline-flex h-4 w-4 items-center justify-center">
-          <svg
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={`absolute h-4 w-4 transition-all duration-300 ease-out ${
-              isLoading ? "scale-75 opacity-0" : "scale-100 opacity-100"
-            }`}
-            aria-hidden="true"
-          >
-            <path d="M10 3v8" />
-            <path d="m6.75 8.75 3.25 3.25 3.25-3.25" />
-            <path d="M4 14.5h12" />
-          </svg>
-          <svg
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            strokeLinecap="round"
-            className={`absolute h-4 w-4 transition-all duration-300 ease-out ${
-              isLoading ? "scale-100 animate-spin opacity-100" : "scale-75 opacity-0"
-            }`}
-            aria-hidden="true"
-          >
-            <path d="M10 3.5a6.5 6.5 0 1 1-4.6 1.9" />
-          </svg>
+        <span className="inline-grid grid-cols-[1rem_auto] items-center gap-2 leading-none">
+          <span className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center translate-y-px">
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`absolute h-4 w-4 transition-all duration-300 ease-out ${
+                isLoading ? "scale-75 opacity-0" : "scale-100 opacity-100"
+              }`}
+              aria-hidden="true"
+            >
+              <path d="M10 3v8" />
+              <path d="m6.75 8.75 3.25 3.25 3.25-3.25" />
+              <path d="M4 14.5h12" />
+            </svg>
+            <svg
+              viewBox="0 0 20 20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              strokeLinecap="round"
+              className={`absolute h-4 w-4 transition-all duration-300 ease-out ${
+                isLoading ? "scale-100 animate-spin opacity-100" : "scale-75 opacity-0"
+              }`}
+              aria-hidden="true"
+            >
+              <path d="M10 3.5a6.5 6.5 0 1 1-4.6 1.9" />
+            </svg>
+          </span>
+          <span className="block translate-y-[-1px] leading-none">{label}</span>
         </span>
-        <span>{label}</span>
       </button>
       {errorMessage ? (
         <span role="alert" aria-live="polite" className="text-xs text-red-600">

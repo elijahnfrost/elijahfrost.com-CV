@@ -8,6 +8,8 @@ import {
 import type { CVData, CVEntry } from "@/app/lib/notion";
 import {
   extractContactInfo,
+  orderedBodySections,
+  splitAboutMetadata,
   type SectionMap,
 } from "@/app/lib/cv-dynamic";
 
@@ -29,14 +31,6 @@ type ResumeDensityConfig = {
 };
 
 const HEADER_WEBSITE = "elijahfrost.com";
-const BODY_EXCLUDED_SECTIONS = new Set(["About", "Contact"]);
-const KNOWN_SECTION_ORDER: Record<string, number> = {
-  Education: 1,
-  Research: 2,
-  Experience: 3,
-  Recognition: 4,
-  Skills: 5,
-};
 
 const RESUME_BASE_CONFIG: ResumeDensityConfig = {
   nameSize: 12.5,
@@ -339,44 +333,14 @@ function estimateResumeHeight(
   return textHeight + verticalPadding;
 }
 
-function sectionOrderFromEntry(entry: CVEntry): number | null {
-  const unknownEntry = entry as CVEntry & Record<string, unknown>;
-  const direct = unknownEntry.sectionOrder;
-  if (typeof direct === "number" && Number.isFinite(direct)) return direct;
-
-  const spaced = unknownEntry["Section Order"];
-  if (typeof spaced === "number" && Number.isFinite(spaced)) return spaced;
-
-  return null;
-}
-
-function sectionOrderFromGroup(sectionName: string, entries: CVEntry[]): number | null {
-  for (const entry of entries) {
-    const order = sectionOrderFromEntry(entry);
-    if (order != null) return order;
-  }
-  return KNOWN_SECTION_ORDER[sectionName] ?? null;
-}
-
 function orderedBodySectionsForPdf(sections: SectionMap): Array<{ name: string; entries: CVEntry[] }> {
-  const rows = Object.entries(sections).filter(
-    ([sectionName, entries]) =>
-      !BODY_EXCLUDED_SECTIONS.has(sectionName) && Array.isArray(entries)
-  );
-
-  rows.sort(([aName, aEntries], [bName, bEntries]) => {
-    const aOrder = sectionOrderFromGroup(aName, aEntries);
-    const bOrder = sectionOrderFromGroup(bName, bEntries);
-    const aHasOrder = aOrder != null;
-    const bHasOrder = bOrder != null;
-
-    if (aHasOrder && bHasOrder) return (aOrder as number) - (bOrder as number);
-    if (aHasOrder) return -1;
-    if (bHasOrder) return 1;
-    return aName.localeCompare(bName);
+  return orderedBodySections(sections).map(({ name, entries }) => {
+    if (name !== "About") return { name, entries };
+    return {
+      name,
+      entries: splitAboutMetadata(entries).contentEntries,
+    };
   });
-
-  return rows.map(([name, entries]) => ({ name, entries }));
 }
 
 function sectionHeader(title: string, styles: MitStyles) {

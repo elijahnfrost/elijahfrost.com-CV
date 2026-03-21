@@ -7,6 +7,7 @@ import {
   extractAcademicStats,
   extractContactInfo,
   orderedBodySections,
+  splitAboutMetadata,
   sectionId,
   type SectionMap,
 } from "@/app/lib/cv-dynamic";
@@ -442,6 +443,14 @@ export function CVSite({
   ];
 
   const renderSection = (name: string, entries: CVEntry[]) => {
+    if (name === "About") {
+      const aboutEntries = splitAboutMetadata(entries).contentEntries;
+      return aboutEntries.length > 0 ? (
+        <GenericSection title="About" entries={aboutEntries} />
+      ) : (
+        <EmptySection id="about" title="About" />
+      );
+    }
     if (name === "Education") {
       return entries.length > 0 ? (
         <EducationSection entries={entries} statsLine={educationStats} />

@@ -38,7 +38,7 @@ export function sectionId(sectionName: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-const BODY_EXCLUDED_SECTIONS = new Set(["About", "Contact"]);
+const BODY_EXCLUDED_SECTIONS = new Set(["Contact"]);
 
 function sectionOrderFromEntry(entry: CVEntry): number | null {
   const unknownEntry = entry as CVEntry & Record<string, unknown>;
@@ -51,21 +51,17 @@ function sectionOrderFromEntry(entry: CVEntry): number | null {
   return null;
 }
 
-function lowestOrderEntry(entries: CVEntry[]): CVEntry | null {
-  if (!entries.length) return null;
-  const ordered = [...entries].sort((a, b) => {
-    const aOrder = a.order ?? Number.MAX_SAFE_INTEGER;
-    const bOrder = b.order ?? Number.MAX_SAFE_INTEGER;
-    if (aOrder !== bOrder) return aOrder - bOrder;
-    return normalizeText(a.name).localeCompare(normalizeText(b.name));
-  });
-  return ordered[0] ?? null;
+function sectionOrderFromEntries(entries: CVEntry[]): number | null {
+  const values = entries
+    .map((entry) => sectionOrderFromEntry(entry))
+    .filter((value): value is number => value != null);
+  if (!values.length) return null;
+  return Math.min(...values);
 }
 
 export function orderedSectionNames(sections: SectionMap): string[] {
   const rows = sectionValues(sections).map(([name, entries]) => {
-    const lowest = lowestOrderEntry(entries);
-    const sectionOrder = lowest ? sectionOrderFromEntry(lowest) : null;
+    const sectionOrder = sectionOrderFromEntries(entries);
     return {
       name,
       sectionOrder,
