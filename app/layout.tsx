@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description: "Student Researcher & Developer",
   icons: {
     icon: "/icon.svg",
+    shortcut: "/icon.svg",
   },
 };
 
