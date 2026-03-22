@@ -126,7 +126,7 @@ export function extractContactInfo(sections: SectionMap): ContactInfo {
 
   const websiteFromContact = contactEntries
     .filter((entry) => /website|contact form/i.test(`${entry.name} ${entry.subtitle ?? ""}`))
-    .map((entry) => normalizeText(entry.link ?? entry.subtitle ?? entry.description))
+    .map((entry) => normalizeText(entry.link ?? ""))
     .find(Boolean);
 
   const website = normalizeText(contactEntry?.link) || websiteFromContact || "elijahfrost.com";
